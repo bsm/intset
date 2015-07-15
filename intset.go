@@ -1,6 +1,9 @@
 package intset
 
-import "sort"
+import (
+	"encoding/json"
+	"sort"
+)
 
 type Set struct{ items []int }
 
@@ -76,6 +79,20 @@ func (s *Set) Intersects(t *Set) bool {
 
 // Slice returns the int slice
 func (s *Set) Slice() []int { return s.items }
+
+// MarshalJSON encodes the set as JSON
+func (s *Set) MarshalJSON() ([]byte, error) { return json.Marshal(s.items) }
+
+// UnmarshalJSON decodes JSON into a set
+func (s *Set) UnmarshalJSON(data []byte) error {
+	var vv []int
+	if err := json.Unmarshal(data, &vv); err != nil {
+		return err
+	}
+
+	*s = *Use(vv...)
+	return nil
+}
 
 func index(vs []int, v int, offset int) (int, bool) {
 	pos := sort.SearchInts(vs[offset:], v) + offset

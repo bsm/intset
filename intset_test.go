@@ -1,6 +1,7 @@
 package intset
 
 import (
+	"encoding/json"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -59,6 +60,17 @@ var _ = Describe("Set", func() {
 		oth.Add(7)
 		oth.Add(4)
 		Expect(subject.Intersects(oth)).To(BeTrue())
+	})
+
+	It("should marshal/unmarshal JSON", func() {
+		bin, err := json.Marshal(subject)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(string(bin)).To(Equal(`[2,4,6]`))
+
+		var set *Set
+		err = json.Unmarshal([]byte(`[2,3,1]`), &set)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(set.Slice()).To(Equal([]int{1, 2, 3}))
 	})
 
 })
